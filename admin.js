@@ -10,6 +10,71 @@ let menuAvailabilityFilter = 'all';
 // BroadcastChannel for synchronization between tabs
 const channel = new BroadcastChannel('campuseats_sync');
 
+/* ---------- Toast Notification System ---------- */
+function showAdminNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = `admin-toast toast-${type}`;
+  
+  const icons = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠',
+    info: 'ℹ'
+  };
+  
+  const colors = {
+    success: 'linear-gradient(135deg, #00b894 0%, #00cec9 100%)',
+    error: 'linear-gradient(135deg, #d63031 0%, #e17055 100%)',
+    warning: 'linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%)',
+    info: 'linear-gradient(135deg, #0984e3 0%, #74b9ff 100%)'
+  };
+  
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: ${colors[type]};
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    animation: adminToastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  `;
+  
+  notification.innerHTML = `
+    <span style="font-size: 1.2rem; font-weight: 800;">${icons[type]}</span>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.animation = 'adminToastSlideOut 0.4s ease';
+    setTimeout(() => notification.remove(), 400);
+  }, 3000);
+}
+
+// Add admin toast animation styles
+const adminToastStyle = document.createElement('style');
+adminToastStyle.textContent = `
+  @keyframes adminToastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes adminToastSlideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(120%); opacity: 0; }
+  }
+`;
+document.head.appendChild(adminToastStyle);
+
 /* ---------- DOM Elements ---------- */
 const loginPage = document.getElementById('loginPage');
 const dashboardPage = document.getElementById('dashboardPage');
@@ -92,7 +157,7 @@ loginForm.addEventListener('submit', (e) => {
     localStorage.setItem('campuseats_admin_logged_in', 'true');
     showDashboard();
   } else {
-    alert('Invalid credentials. Please try again.');
+    showAdminNotification('Invalid credentials. Please try again.', 'error');
   }
 });
 
@@ -436,21 +501,19 @@ function updateOrderStatus(orderId) {
   if (currentIndex < statusFlow.length - 1) {
     const newStatus = statusFlow[currentIndex + 1];
     
-    if (confirm(`Change order status from "${order.status}" to "${newStatus}"?`)) {
-      order.status = newStatus;
-      localStorage.setItem('campuseats_orders', JSON.stringify(orders));
-      broadcastUpdate('order_update', { orderId, newStatus });
-      
-      if (currentSection === 'overview') {
-        updateDashboard();
-      } else {
-        renderOrders();
-      }
-      
-      alert(`Order ${orderId} status updated to ${newStatus}`);
+    order.status = newStatus;
+    localStorage.setItem('campuseats_orders', JSON.stringify(orders));
+    broadcastUpdate('order_update', { orderId, newStatus });
+    
+    if (currentSection === 'overview') {
+      updateDashboard();
+    } else {
+      renderOrders();
     }
+    
+    showAdminNotification(`Order ${orderId} status updated to ${newStatus}`, 'success');
   } else {
-    alert('Order is already completed.');
+    showAdminNotification('Order is already completed.', 'warning');
   }
 }
 
@@ -570,7 +633,7 @@ function deleteMenuItem(itemId) {
     localStorage.setItem('campuseats_menu', JSON.stringify(menuItems));
     broadcastUpdate('menu_update', { itemId });
     renderAdminMenu();
-    alert('Menu item deleted successfully');
+    showAdminNotification('Menu item deleted successfully', 'success');
   }
 }
 
@@ -584,7 +647,7 @@ function toggleAvailability(itemId) {
   broadcastUpdate('menu_update', { itemId, available: item.available });
   renderAdminMenu();
   
-  alert(`Item marked as ${item.available ? 'available' : 'unavailable'}`);
+  showAdminNotification(`Item marked as ${item.available ? 'available' : 'unavailable'}`, 'success');
 }
 
 // Save menu item
@@ -620,7 +683,7 @@ menuForm.addEventListener('submit', (e) => {
   menuForm.reset();
   renderAdminMenu();
   
-  alert(editItemId ? 'Menu item updated successfully' : 'Menu item added successfully');
+  showAdminNotification(editItemId ? 'Menu item updated successfully' : 'Menu item added successfully', 'success');
 });
 
 // Close modal

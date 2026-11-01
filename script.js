@@ -473,7 +473,7 @@ function addToCart(itemId) {
   }
   saveCart();
   updateCartBadge();
-  showNotification('Item added to cart!');
+  showNotification('Item added to cart!', 'success');
 }
 
 function removeFromCart(itemId) {
@@ -670,12 +670,31 @@ function renderOrders() {
 
   emptyOrders.style.display = 'none';
 
-  ordersList.innerHTML = orders.map(order => `
+  ordersList.innerHTML = orders.map(order => {
+    const statusFlow = ['Order Placed', 'Preparing', 'Ready for Pickup', 'Completed'];
+    const currentIndex = statusFlow.indexOf(order.status);
+    
+    return `
     <div class="order-card">
       <div class="order-header">
         <div class="order-id-display">${order.orderId}</div>
         <div class="order-date">${formatDate(order.date)}</div>
       </div>
+      
+      <!-- Order Progress Timeline -->
+      <div class="order-progress">
+        ${statusFlow.map((status, index) => {
+          const isCompleted = index <= currentIndex;
+          const isCurrent = index === currentIndex;
+          return `
+            <div class="progress-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}">
+              <div class="progress-dot">${isCompleted ? '✓' : index + 1}</div>
+              <div class="progress-label">${status}</div>
+            </div>
+          `;
+        }).join('<div class="progress-line"></div>')}
+      </div>
+      
       <div class="order-items-list">
         ${order.items.map(item => `
           <div class="order-item">
@@ -697,7 +716,7 @@ function renderOrders() {
         </div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function getStatusClass(status) {
@@ -724,44 +743,70 @@ function updateOrderStatus(orderId, newStatus) {
   }
 }
 
-/* ---------- Notification ---------- */
-function showNotification(message) {
+/* ---------- Toast Notification System ---------- */
+function showNotification(message, type = 'success') {
   const notification = document.createElement('div');
+  notification.className = `toast-notification toast-${type}`;
+  
+  const icons = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠',
+    info: 'ℹ'
+  };
+  
+  const colors = {
+    success: 'linear-gradient(135deg, #00b894 0%, #00cec9 100%)',
+    error: 'linear-gradient(135deg, #d63031 0%, #e17055 100%)',
+    warning: 'linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%)',
+    info: 'linear-gradient(135deg, #0984e3 0%, #74b9ff 100%)'
+  };
+  
   notification.style.cssText = `
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--primary);
+    bottom: 30px;
+    right: 30px;
+    background: ${colors[type]};
     color: white;
     padding: 16px 24px;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow);
-    z-index: 2000;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
     font-weight: 600;
-    animation: slideIn 0.3s ease;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   `;
-  notification.textContent = message;
+  
+  notification.innerHTML = `
+    <span style="font-size: 1.2rem; font-weight: 800;">${icons[type]}</span>
+    <span>${message}</span>
+  `;
+  
   document.body.appendChild(notification);
 
   setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 2000);
+    notification.style.animation = 'toastSlideOut 0.4s ease';
+    setTimeout(() => notification.remove(), 400);
+  }, 3000);
 }
 
-// Add animation styles
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
+// Add toast animation styles
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  @keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
   }
-  @keyframes slideOut {
+  @keyframes toastSlideOut {
     from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(120%); opacity: 0; }
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(toastStyle);
 
 /* ---------- Initialize ---------- */
 document.addEventListener('DOMContentLoaded', () => {

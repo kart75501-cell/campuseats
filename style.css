@@ -161,67 +161,111 @@ button {
 
 /* ---------- Hero Section ---------- */
 .hero {
-  background: linear-gradient(135deg, #fff5f0 0%, #fff 100%);
-  padding: 60px 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 50%, #ffa94d 100%);
+  padding: 80px 20px 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 60px;
   min-height: calc(100vh - 80px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
 }
 
 .hero-content {
   flex: 1;
   max-width: 600px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-size: 3.8rem;
   font-weight: 900;
-  color: var(--secondary);
-  line-height: 1.2;
+  color: white;
+  line-height: 1.1;
   margin-bottom: 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .hero-title .highlight {
-  color: var(--primary);
+  color: #fff3cd;
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
-  color: var(--text-light);
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.95);
   margin-bottom: 32px;
   line-height: 1.8;
+  font-weight: 500;
 }
 
 .hero-image {
   flex: 1;
   display: flex;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-card {
   background: white;
-  padding: 40px;
+  padding: 48px;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   text-align: center;
-  max-width: 300px;
+  max-width: 350px;
+  transform: rotate(-3deg);
+  transition: transform 0.3s;
+}
+
+.hero-card:hover {
+  transform: rotate(0deg);
 }
 
 .hero-emoji {
-  font-size: 4rem;
-  margin-bottom: 16px;
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .hero-card h3 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: var(--secondary);
   margin-bottom: 8px;
+  font-weight: 800;
 }
 
 .hero-card p {
   color: var(--text-light);
+  font-size: 1.1rem;
 }
 
 /* ---------- Buttons ---------- */
@@ -465,14 +509,15 @@ button {
 /* ---------- Food Card ---------- */
 .food-card {
   background: white;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
 }
 
 .food-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px);
   box-shadow: var(--shadow-hover);
 }
 
@@ -487,13 +532,18 @@ button {
 
 .food-image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
   background: var(--bg-alt);
+  transition: transform 0.3s;
+}
+
+.food-card:hover .food-image {
+  transform: scale(1.05);
 }
 
 .food-info {
-  padding: 20px;
+  padding: 24px;
 }
 
 .availability-badge {
@@ -717,13 +767,20 @@ button {
 
 .next-discount {
   margin-top: 16px;
-  padding: 12px;
-  background: #e8f5e9;
+  padding: 16px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--accent);
   text-align: center;
   font-weight: 600;
+  border: 2px solid #a5d6a7;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 /* ---------- Checkout Page ---------- */
@@ -860,41 +917,56 @@ button {
   margin: 60px auto;
   background: white;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   padding: 48px 32px;
   text-align: center;
+  animation: confirmPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes confirmPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .success-icon {
-  width: 80px;
-  height: 80px;
-  background: var(--accent);
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--accent) 0%, #00b894 100%);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 900;
   margin: 0 auto 24px;
+  animation: successPulse 2s infinite;
+}
+
+@keyframes successPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(0, 184, 148, 0); }
 }
 
 .confirmation-card h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: var(--secondary);
   margin-bottom: 16px;
+  font-weight: 800;
 }
 
 .order-id {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--text-light);
   margin-bottom: 12px;
+  font-weight: 600;
 }
 
 .confirmation-message {
   color: var(--text-light);
   margin-bottom: 32px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 1.05rem;
 }
 
 .confirmation-details {
@@ -1029,6 +1101,80 @@ button {
   gap: 12px;
 }
 
+/* ---------- Order Progress Timeline ---------- */
+.order-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  padding: 20px;
+  background: var(--bg-light);
+  border-radius: var(--radius-sm);
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.progress-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.progress-step.completed .progress-dot {
+  background: var(--accent);
+  color: white;
+}
+
+.progress-step.current .progress-dot {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2);
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-weight: 500;
+  text-align: center;
+}
+
+.progress-step.completed .progress-label {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.progress-step.current .progress-label {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.progress-line {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  margin: 0 8px 28px;
+}
+
+.progress-step.completed + .progress-line {
+  background: var(--accent);
+}
+
 .status-select {
   padding: 8px 16px;
   border: 2px solid var(--border);
@@ -1135,7 +1281,21 @@ footer {
   }
 
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+  }
+  
+  .order-progress {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .progress-line {
+    display: none;
+  }
+  
+  .progress-step {
+    flex: 0 0 auto;
+    min-width: 80px;
   }
 
   .cart-layout {
@@ -1171,11 +1331,11 @@ footer {
 
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .page-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .discount-tiers {
@@ -1184,6 +1344,20 @@ footer {
 
   .tier {
     min-width: auto;
+  }
+  
+  .order-progress {
+    font-size: 0.85rem;
+  }
+  
+  .progress-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  
+  .progress-label {
+    font-size: 0.65rem;
   }
 
   .steps {
