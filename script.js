@@ -303,6 +303,9 @@ let orders = JSON.parse(localStorage.getItem('campuseats_orders')) || [];
 let currentCategory = 'all';
 let searchQuery = '';
 
+// BroadcastChannel for synchronization with admin dashboard
+const channel = new BroadcastChannel('campuseats_sync');
+
 /* ---------- DOM Elements ---------- */
 const menuToggle = document.getElementById('menuToggle');
 const navLinks = document.getElementById('navLinks');
@@ -712,6 +715,7 @@ function updateOrderStatus(orderId, newStatus) {
   if (orderIndex !== -1) {
     orders[orderIndex].status = newStatus;
     localStorage.setItem('campuseats_orders', JSON.stringify(orders));
+    channel.postMessage({ type: 'order_update', data: { orderId, newStatus } });
     renderOrders();
     
     if (newStatus === 'Ready for Pickup') {
@@ -761,7 +765,49 @@ document.head.appendChild(style);
 
 /* ---------- Initialize ---------- */
 document.addEventListener('DOMContentLoaded', () => {
+  // Save menu to localStorage for admin access
+  if (!localStorage.getItem('campuseats_menu')) {
+    localStorage.setItem('campuseats_menu', JSON.stringify(MENU_ITEMS));
+  } else {
+    // Load menu from localStorage if admin has made changes
+    MENU_ITEMS = JSON.parse(localStorage.getItem('campuseats_menu')) || MENU_ITEMS;
+  }
+  
   updateCartBadge();
   renderFeatured();
   renderMenu();
+  
+  // Listen for updates from admin dashboard
+  channel.onmessage = (event) => {
+    const { type, data } = event.data;
+    
+    if (type === 'order_update') {
+      orders = JSON.parse(localStorage.getItem('campuseats_orders')) || [];
+      if (document.getElementById('orders').classList.contains('active')) {
+        renderOrders();
+      }
+    }
+    
+    if (type === 'menu_update') {
+      MENU_ITEMS = JSON.parse(localStorage.getItem('campuseats_menu')) || MENU_ITEMS;
+      renderMenu();
+      renderFeatured();
+    }
+  };
+  
+  // Also listen for storage events (backup sync method)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'campuseats_orders') {
+      orders = JSON.parse(e.newValue) || [];
+      if (document.getElementById('orders').classList.contains('active')) {
+        renderOrders();
+      }
+    }
+    
+    if (e.key === 'campuseats_menu') {
+      MENU_ITEMS = JSON.parse(e.newValue) || MENU_ITEMS;
+      renderMenu();
+      renderFeatured();
+    }
+  });
 });

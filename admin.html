@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusEats Admin – Canteen Management</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- ADMIN LOGIN PAGE -->
+  <div id="loginPage" class="login-page">
+    <div class="login-container">
+      <div class="login-header">
+        <span class="logo-icon">🍽️</span>
+        <h1>Campus<span>Eats</span> Admin</h1>
+        <p>Canteen Management Dashboard</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <p class="login-hint">Demo credentials: admin / admin123</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="dashboardPage" class="dashboard-page" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-icon">🍽️</span>
+        <span class="logo-text">Campus<span>Eats</span></span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" data-section="overview">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-link" data-section="orders">
+          <span class="nav-icon">📋</span>
+          <span>Orders</span>
+        </a>
+        <a href="#" class="nav-link" data-section="menu">
+          <span class="nav-icon">🍔</span>
+          <span>Menu</span>
+        </a>
+        <a href="#" class="nav-link" id="logoutBtn">
+          <span class="nav-icon">🚪</span>
+          <span>Logout</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="index.html" class="view-site-link">
+          <span>🌐</span>
+          <span>View Student Site</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <h1 id="pageTitle">Dashboard Overview</h1>
+        <div class="header-actions">
+          <span class="admin-badge">Admin</span>
+        </div>
+      </header>
+
+      <!-- Overview Section -->
+      <section id="overviewSection" class="dashboard-section active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">📦</div>
+            <div class="stat-info">
+              <div class="stat-value" id="totalOrders">0</div>
+              <div class="stat-label">Total Orders</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">⏳</div>
+            <div class="stat-info">
+              <div class="stat-value" id="pendingOrders">0</div>
+              <div class="stat-label">Pending Orders</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">👨‍🍳</div>
+            <div class="stat-info">
+              <div class="stat-value" id="preparingOrders">0</div>
+              <div class="stat-label">Preparing</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="readyOrders">0</div>
+              <div class="stat-label">Ready for Pickup</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">🎉</div>
+            <div class="stat-info">
+              <div class="stat-value" id="completedOrders">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">💰</div>
+            <div class="stat-info">
+              <div class="stat-value" id="totalRevenue">₹0</div>
+              <div class="stat-label">Total Revenue</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Orders by Status</h3>
+            <div class="chart-container" id="ordersChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Revenue Overview</h3>
+            <div class="chart-container" id="revenueChart"></div>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="recent-orders">
+          <h3>Recent Orders</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Student</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders Section -->
+      <section id="ordersSection" class="dashboard-section">
+        <div class="section-header">
+          <h2>Order Management</h2>
+          <div class="filters">
+            <select id="orderFilter" class="filter-select">
+              <option value="all">All Orders</option>
+              <option value="Order Placed">New Orders</option>
+              <option value="Preparing">Preparing</option>
+              <option value="Ready for Pickup">Ready for Pickup</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <div class="search-box">
+              <input type="text" id="orderSearch" placeholder="Search by Order ID, Name, or Roll No..." />
+              <span class="search-icon">🔍</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Student Name</th>
+                <th>Roll Number</th>
+                <th>Department</th>
+                <th>Items</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+                <th>Discount</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyOrders" style="display: none;">
+          <div class="empty-icon">📋</div>
+          <h3>No orders found</h3>
+          <p>Orders will appear here when students place them</p>
+        </div>
+      </section>
+
+      <!-- Menu Section -->
+      <section id="menuSection" class="dashboard-section">
+        <div class="section-header">
+          <h2>Menu Management</h2>
+          <button class="btn btn-primary" id="addMenuItemBtn">+ Add New Item</button>
+        </div>
+
+        <div class="menu-filters">
+          <select id="menuCategoryFilter" class="filter-select">
+            <option value="all">All Categories</option>
+            <option value="snacks">Snacks</option>
+            <option value="fastfood">Fast Food</option>
+            <option value="beverages">Beverages</option>
+            <option value="meals">Meals</option>
+          </select>
+          <select id="menuAvailabilityFilter" class="filter-select">
+            <option value="all">All Items</option>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+        </div>
+
+        <div class="menu-grid" id="adminMenuGrid"></div>
+
+        <div class="empty-state" id="emptyMenu" style="display: none;">
+          <div class="empty-icon">🍔</div>
+          <h3>No menu items found</h3>
+          <p id="emptyMenuText">Please open the student website first to initialize the menu, or add items manually.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit Menu Item Modal -->
+  <div id="menuModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add New Menu Item</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <form id="menuForm" class="modal-body">
+        <input type="hidden" id="editItemId" />
+        <div class="form-group">
+          <label for="itemName">Item Name *</label>
+          <input type="text" id="itemName" required placeholder="e.g., Veg Burger" />
+        </div>
+        <div class="form-group">
+          <label for="itemCategory">Category *</label>
+          <select id="itemCategory" required>
+            <option value="">Select Category</option>
+            <option value="snacks">Snacks</option>
+            <option value="fastfood">Fast Food</option>
+            <option value="beverages">Beverages</option>
+            <option value="meals">Meals</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="itemDescription">Description *</label>
+          <textarea id="itemDescription" required placeholder="Describe the item..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="itemPrice">Price (₹) *</label>
+          <input type="number" id="itemPrice" required min="1" placeholder="e.g., 50" />
+        </div>
+        <div class="form-group">
+          <label for="itemImage">Image URL</label>
+          <input type="url" id="itemImage" placeholder="https://example.com/image.jpg" />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="itemAvailable" checked />
+            <span>Available for ordering</span>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div id="orderModal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>Order Details</h2>
+        <button class="modal-close" id="closeOrderModal">&times;</button>
+      </div>
+      <div class="modal-body" id="orderModalBody"></div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
