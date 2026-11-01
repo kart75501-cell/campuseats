@@ -42,6 +42,44 @@
 - Mark items as Available/Unavailable (Sold Out)
 - Filter by category and availability
 
+### 4. Smart Analytics & Reports
+- **Key Metrics Overview**:
+  - Total Orders (with completed vs active breakdown)
+  - Collected Revenue (actual net earnings collected after discounts)
+  - Gross Order Value (standard menu price value before discounts)
+  - Average Order Value (net intake per order)
+  - Total Discounts Given (% of gross menu value)
+  - Most Popular Food Item (by quantity sold)
+  - Most Popular Food Category (by items sold)
+- **Interactive Date Filters**:
+  - Today (local day 00:00 to 23:59)
+  - Last 7 Days (7 calendar days timeline)
+  - Last 30 Days (30 calendar days timeline)
+  - All Time (all stored orders)
+- **Visual Sales & Insights Charts**:
+  - Daily Order Count (bar chart of orders per day)
+  - Daily Sales Revenue (line chart with ₹ revenue trends)
+  - Orders by Food Category (doughnut chart: Snacks, Fast Food, Beverages, Meals)
+  - Most Popular Food Items (horizontal bar chart of top selling items)
+  - Order Status Distribution (doughnut chart: Placed, Preparing, Ready, Completed)
+  - Discount Distribution by Percentage (tiered discount breakdown chart)
+- **Top Selling Items Table**:
+  - Rank (#1 gold, #2 silver, #3 bronze badges)
+  - Food item name
+  - Category pill
+  - Total quantity ordered
+  - Number of distinct orders containing the item
+  - Total sales value
+- **Dedicated Discount Analytics**:
+  - Total discount amount given
+  - Number of orders receiving discounts
+  - Average discount per eligible order
+  - 5-Tier rule breakdown cards (Below ₹100: 0%, ₹100–₹199: 10%, ₹200–₹299: 15%, ₹300–₹499: 20%, ₹500+: 25%)
+- **Downloadable CSV Sales Report**:
+  - One-click export for the selected date range
+  - Includes Order ID, Student Name, Roll Number, Department, Order Date, Ordered Items, Subtotal, Discount %, Discount Amount, Final Amount, and Status
+  - UTF-8 BOM encoding for seamless Microsoft Excel and Google Sheets compatibility
+
 ## Synchronization
 
 The admin dashboard and student website synchronize in real-time using:
@@ -88,6 +126,15 @@ The admin dashboard and student website synchronize in real-time using:
 3. Go to student website and verify it appears
 4. Mark an item as "Unavailable"
 5. Verify student cannot add it to cart (shows "Sold Out")
+
+### Step 7: Test Smart Analytics & Sales Reports
+1. In admin dashboard, click "Analytics & Reports" in the sidebar.
+2. Verify overview cards: Total Orders, Collected Revenue (Net), Gross Order Value, Average Order Value (AOV), Total Discounts Given, Most Popular Food Item, and Top Category.
+3. Switch Date Filters between "Today", "Last 7 Days", "Last 30 Days", and "All Time". Verify all cards, charts, and tables update dynamically.
+4. Inspect the 5 visual charts: Daily Order Count, Daily Sales Revenue, Orders by Category, Most Popular Items, and Order Status Distribution.
+5. Check Top Selling Items table: Verify ranking by quantity sold, order count, and total sales.
+6. Inspect Discount Analytics: Verify the 5 tiers (0%, 10%, 15%, 20%, 25%) and discount distribution chart.
+7. Click "📥 Export CSV" to download the real sales report filtered by the selected date range.
 
 ## File Structure
 

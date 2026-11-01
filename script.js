@@ -621,6 +621,7 @@ checkoutForm.addEventListener('submit', (e) => {
     return {
       id: item.id,
       name: item.name,
+      category: item.category,
       price: item.price,
       quantity: quantity,
       total: item.price * quantity
@@ -647,6 +648,7 @@ checkoutForm.addEventListener('submit', (e) => {
 
   orders.unshift(order);
   localStorage.setItem('campuseats_orders', JSON.stringify(orders));
+  channel.postMessage({ type: 'new_order', data: order });
 
   cart = {};
   saveCart();

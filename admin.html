@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CampusEats Admin – Canteen Management</title>
   <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -51,6 +52,10 @@
         <a href="#" class="nav-link" data-section="menu">
           <span class="nav-icon">🍔</span>
           <span>Menu</span>
+        </a>
+        <a href="#" class="nav-link" data-section="analytics">
+          <span class="nav-icon">📈</span>
+          <span>Analytics & Reports</span>
         </a>
         <a href="#" class="nav-link" id="logoutBtn">
           <span class="nav-icon">🚪</span>
@@ -229,6 +234,228 @@
           <div class="empty-icon">🍔</div>
           <h3>No menu items found</h3>
           <p id="emptyMenuText">Please open the student website first to initialize the menu, or add items manually.</p>
+        </div>
+      </section>
+
+      <!-- Analytics & Reports Section -->
+      <section id="analyticsSection" class="dashboard-section">
+        <div class="section-header">
+          <h2>Analytics & Reports</h2>
+          <div class="filters">
+            <select id="dateFilter" class="filter-select">
+              <option value="today">Today</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+              <option value="all" selected>All Time</option>
+            </select>
+            <button class="btn btn-primary" id="exportCSVBtn">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Revenue Calculation Documentation Note -->
+        <div class="revenue-note">
+          <span class="revenue-note-icon">💡</span>
+          <div class="revenue-note-text">
+            <strong>Revenue Accounting Note:</strong> <strong>Collected Revenue</strong> reflects the actual canteen intake collected from students (<code>∑ Order Total</code>). <strong>Total Order Value</strong> reflects the gross food value at standard menu prices (<code>∑ Subtotal</code>). <em>Collected Revenue = Total Order Value − Discounts Given</em>.
+          </div>
+        </div>
+
+        <!-- Analytics Overview Stats -->
+        <div class="stats-grid analytics-stats">
+          <div class="stat-card">
+            <div class="stat-icon blue">📦</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsTotalOrders">0</div>
+              <div class="stat-label">Total Orders</div>
+              <div class="stat-subtext" id="analyticsOrdersSubtext">0 Completed · 0 Active</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">💰</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsTotalRevenue">₹0</div>
+              <div class="stat-label">Collected Revenue</div>
+              <div class="stat-subtext" id="analyticsRevenueSubtext">Gross: ₹0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">📊</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsAvgOrderValue">₹0</div>
+              <div class="stat-label">Avg Order Value</div>
+              <div class="stat-subtext" id="analyticsAovSubtext">Net collected / order</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">🎁</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsTotalDiscounts">₹0</div>
+              <div class="stat-label">Total Discounts</div>
+              <div class="stat-subtext" id="analyticsDiscountSubtext">0% of gross value</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">⭐</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsPopularItem">-</div>
+              <div class="stat-label">Most Popular Item</div>
+              <div class="stat-subtext" id="analyticsPopularItemSubtext">0 units sold</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">🏷️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="analyticsPopularCategory">-</div>
+              <div class="stat-label">Popular Category</div>
+              <div class="stat-subtext" id="analyticsPopularCategorySubtext">0 items ordered</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid analytics-charts-grid">
+          <div class="chart-card">
+            <h3>Daily Order Count</h3>
+            <div class="chart-container" id="dailyOrdersChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Daily Sales Revenue</h3>
+            <div class="chart-container" id="dailyRevenueChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Orders by Food Category</h3>
+            <div class="chart-container" id="categoryChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Most Popular Food Items</h3>
+            <div class="chart-container" id="popularItemsChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Order Status Distribution</h3>
+            <div class="chart-container" id="statusChart"></div>
+          </div>
+        </div>
+
+        <!-- Top Selling Items -->
+        <div class="analytics-section">
+          <div class="analytics-section-header">
+            <h3>Top Selling Items</h3>
+            <span class="analytics-badge" id="topSellingCategoryBadge">Top Category: -</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Item Name</th>
+                  <th>Category</th>
+                  <th>Total Quantity</th>
+                  <th>Number of Orders</th>
+                  <th>Total Sales</th>
+                </tr>
+              </thead>
+              <tbody id="topSellingTable"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="emptyTopSelling" style="display: none;">
+            <div class="empty-icon">📊</div>
+            <h3>No sales data</h3>
+            <p>Orders will appear here when students place them</p>
+          </div>
+        </div>
+
+        <!-- Discount Analytics -->
+        <div class="analytics-section">
+          <div class="analytics-section-header">
+            <h3>Discount Analytics</h3>
+            <span class="analytics-badge info">CampusEats Tiered Rules</span>
+          </div>
+          <div class="stats-grid discount-stats">
+            <div class="stat-card">
+              <div class="stat-icon orange">🎁</div>
+              <div class="stat-info">
+                <div class="stat-value" id="discountTotalAmount">₹0</div>
+                <div class="stat-label">Total Discount Given</div>
+                <div class="stat-subtext" id="discountSavingsSubtext">Total savings passed to students</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon blue">📋</div>
+              <div class="stat-info">
+                <div class="stat-value" id="discountOrderCount">0</div>
+                <div class="stat-label">Discounted Orders</div>
+                <div class="stat-subtext" id="discountEligibleSubtext">0% of total orders</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon purple">📊</div>
+              <div class="stat-info">
+                <div class="stat-value" id="discountAvgPerOrder">₹0</div>
+                <div class="stat-label">Avg Discount / Order</div>
+                <div class="stat-subtext" id="discountAvgSubtext">Per eligible discounted order</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier Breakdown Cards -->
+          <div class="discount-rules-bar" id="discountRulesBar">
+            <div class="discount-rule-card">
+              <div class="discount-rule-tier">Below ₹100</div>
+              <div class="discount-rule-val">0%</div>
+              <div class="discount-rule-count" id="tierCount0">0 orders</div>
+            </div>
+            <div class="discount-rule-card">
+              <div class="discount-rule-tier">₹100–₹199</div>
+              <div class="discount-rule-val">10%</div>
+              <div class="discount-rule-count" id="tierCount10">0 orders</div>
+            </div>
+            <div class="discount-rule-card">
+              <div class="discount-rule-tier">₹200–₹299</div>
+              <div class="discount-rule-val">15%</div>
+              <div class="discount-rule-count" id="tierCount15">0 orders</div>
+            </div>
+            <div class="discount-rule-card">
+              <div class="discount-rule-tier">₹300–₹499</div>
+              <div class="discount-rule-val">20%</div>
+              <div class="discount-rule-count" id="tierCount20">0 orders</div>
+            </div>
+            <div class="discount-rule-card">
+              <div class="discount-rule-tier">₹500+</div>
+              <div class="discount-rule-val">25%</div>
+              <div class="discount-rule-count" id="tierCount25">0 orders</div>
+            </div>
+          </div>
+
+          <div class="chart-card" style="margin-top: 24px;">
+            <h3>Discount Distribution by Percentage</h3>
+            <div class="chart-container" id="discountDistributionChart"></div>
+          </div>
+        </div>
+
+        <!-- Analytics Explainer & Documentation Guide -->
+        <div class="analytics-callout">
+          <div class="callout-icon">📘</div>
+          <div class="callout-content">
+            <h4>CampusEats Analytics Documentation & Calculation Methodology</h4>
+            <div class="callout-grid">
+              <div class="callout-item">
+                <strong>Collected Revenue (Net)</strong>
+                <p>Calculated as <code>∑(Order Total)</code> across filtered orders. Represents the actual revenue collected after applying volume discounts.</p>
+              </div>
+              <div class="callout-item">
+                <strong>Total Order Value (Gross)</strong>
+                <p>Calculated as <code>∑(Order Subtotal)</code> before discounts. Represents the full menu value of all food items ordered.</p>
+              </div>
+              <div class="callout-item">
+                <strong>Average Order Value (AOV)</strong>
+                <p>Calculated dynamically as <code>Collected Revenue ÷ Total Orders</code>. Safely yields ₹0 when no orders exist.</p>
+              </div>
+              <div class="callout-item">
+                <strong>Volume-Based Discounts</strong>
+                <p>Preserves CampusEats tiered rules: Below ₹100 (0%), ₹100–₹199 (10%), ₹200–₹299 (15%), ₹300–₹499 (20%), ₹500+ (25%). Derived from saved order totals.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>
